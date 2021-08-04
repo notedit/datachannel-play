@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+    <title> webrtc test </title>
+    <style type="text/css">
+        .room {
+            cursor: pointer;
+        }
+
+        div.select {
+            display: inline-block;
+            margin: 0 0 1em 0;
+        }
+    </style>
+
+
+    <script type='text/javascript'>
+
+        window.localStorage.setItem('debug', '*');
+
+        let datachannel;
+
+        async function publish() {
+
+            let pc;
+
+            pc = new RTCPeerConnection();
+
+            datachannel = pc.createDataChannel('message', { ordered: true });
+            datachannel.binaryType = 'arraybuffer';
+            datachannel.addEventListener('open', () => {
+                console.log('datachannel open');
+
+                setTimeout(() => {
+                    datachannel.send('aaaaaaaaaaaa=====');
+                }, 1000);
+            });
+
+            datachannel.addEventListener('message', (data) => {
+                console.log(data);
+            });
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+
+            console.log(offer.sdp);
+
+            let res = await fetch("http://localhost:8080/rtc/v1/publish", {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sdp: offer.sdp
+                })
+            })
+
+            console.dir(res)
+
+            console.dir(res)
+            let ret = await res.json()
+
+            let answer = new RTCSessionDescription({
+                type: 'answer',
+                sdp: ret.sdp
+            })
+
+            await pc.setRemoteDescription(answer);
+        }
+
+
+
+    </script>
+
+</head>
+
+<body>
+    <h1>WebRTC Demo</h1>
+    <br />
+
+
+    <div>
+
+        <button onclick="publish()">Publish</button>
+        <br><br>
+    </div>
+
+
+
+</body>
+
+
+</html>
