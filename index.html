@@ -33,7 +33,7 @@
             datachannel.addEventListener('open', () => {
                 console.log('datachannel open');
 
-                setTimeout(() => {
+                setInterval(() => {
                     datachannel.send('aaaaaaaaaaaa=====');
                 }, 1000);
             });

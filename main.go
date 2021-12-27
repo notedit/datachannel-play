@@ -50,6 +50,8 @@ func publish(c *gin.Context) {
 			n := len(dcMsg.Data)
 			fmt.Println("OnMessage ", n)
 			fmt.Println(dcMsg.Data)
+
+			dc.SendText(string(dcMsg.Data))
 		})
 	})
 
